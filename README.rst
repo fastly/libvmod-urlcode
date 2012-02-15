@@ -1,9 +1,9 @@
 ============
-vmod_example
+vmod_urlcode
 ============
 
 ----------------------
-Varnish Example Module
+Varnish URLcode Module
 ----------------------
 
 :Author: Rogier "DocWilco" Mulhuijzen
