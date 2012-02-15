@@ -53,7 +53,8 @@ Prototype
 Return value
 	STRING
 Description
-	Returns a percent encoded version of input.
+	Returns a percent encoded version of input. Or NULL if sess_workspace
+	does not have enough space for the operation.
 Example
 	::
 
@@ -70,7 +71,9 @@ Prototype
 Return value
 	STRING
 Description
-	Returns a percent decoded version of input.
+	Returns a percent decoded version of input. Or NULL if either the 
+	encoding is invalid or sess_workspace does not have enough space for
+	the operation.
 Example
 	::
 
