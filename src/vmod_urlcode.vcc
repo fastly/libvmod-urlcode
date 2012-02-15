@@ -1,0 +1,3 @@
+Module urlcode
+Function STRING encode(STRING_LIST)
+Function STRING decode(STRING_LIST)

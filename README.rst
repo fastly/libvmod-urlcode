@@ -6,49 +6,79 @@ vmod_example
 Varnish Example Module
 ----------------------
 
-:Author: Martin Blix Grydeland
-:Date: 2011-05-26
+:Author: Rogier "DocWilco" Mulhuijzen
+:Date: 2012-02-15
 :Version: 1.0
 :Manual section: 3
 
 SYNOPSIS
 ========
 
-import example;
+::
+
+	import urlcode;
+	urlcode.encode(<string>);
+	urlcode.decode(<string>);
 
 DESCRIPTION
 ===========
 
-Example Varnish vmod demonstrating how to write an out-of-tree Varnish vmod.
+Varnish Module (vmod) for encoding or decoding to/from "percent encoding" as 
+per RFC3986.
 
-Implements the traditional Hello World as a vmod.
+For backward compatibility, a + will be decoded to a space.
 
 FUNCTIONS
 =========
 
-hello
------
+Example VCL::
+
+	backend foo { ... };
+
+	import urlcode;
+
+	sub vcl_recv {
+		set req.url = "/example?url=" + urlcode.encode("http://" +
+			req.http.host + req.url);
+	}
+
+encode
+------
 
 Prototype
         ::
 
-                hello(STRING S)
+		urlcode.encode(STRING input)
+
 Return value
 	STRING
 Description
-	Returns "Hello, " prepended to S
+	Returns a percent encoded version of input.
 Example
+	::
+
+		set resp.http.foo = urlcode.encode("hello world!");
+
+decode
+------
+
+Prototype
         ::
 
-                set resp.http.hello = example.hello("World");
+		urlcode.decode(STRING input)
+
+Return value
+	STRING
+Description
+	Returns a percent decoded version of input.
+Example
+	::
+
+		set resp.http.foo = urlcode.decode("hello%20world%21");
+
 
 INSTALLATION
 ============
-
-This is an example skeleton for developing out-of-tree Varnish
-vmods. It implements the "Hello, World!" as a vmod callback. Not
-particularly useful in good hello world tradition, but demonstrates how
-to get the glue around a vmod working.
 
 The source tree is based on autotools to configure the building, and
 does also have the necessary bits in place to do functional unit tests
@@ -72,25 +102,16 @@ Make targets:
 * make install - installs your vmod in `VMODDIR`
 * make check - runs the unit tests in ``src/tests/*.vtc``
 
-In your VCL you could then use this vmod along the following lines::
-        
-        import example;
-
-        sub vcl_deliver {
-                # This sets resp.http.hello to "Hello, World"
-                set resp.http.hello = example.hello("World");
-        }
 
 HISTORY
 =======
 
-This manual page was released as part of the libvmod-example package,
-demonstrating how to create an out-of-tree Varnish vmod.
+Version 0.1: Initial version.
 
 COPYRIGHT
 =========
 
 This document is licensed under the same license as the
-libvmod-example project. See LICENSE for details.
+libvmod-urlcode project. See LICENSE for details.
 
-* Copyright (c) 2011 Varnish Software
+* Copyright (c) 2012 Fastly Inc.

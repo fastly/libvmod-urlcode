@@ -1,0 +1,55 @@
+varnishtest "Test urlcode vmod"
+
+server s1 {
+	rxreq 
+	txresp	-hdr "Foo1: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_~" \
+		-hdr "Foo2: `!@#$%^&*()+={}[]:;'\\|<>,?/ \"" \
+		-hdr "Foo3: hello" \
+		-hdr "Foo4: world" \
+		-hdr "Foo5: %2" \
+		-hdr "Foo6: %" \
+		-hdr "Foo7: +" \
+		-hdr "Connection: close" \
+		-body "Hi!\n"
+} -start
+
+varnish v1 -vcl+backend {
+	import urlcode from "${vmod_topbuild}/src/.libs/libvmod_urlcode.so";
+
+	sub vcl_fetch {
+		set beresp.http.Bar1 = urlcode.encode(beresp.http.Foo1);
+		set beresp.http.Baz1 = urlcode.decode(beresp.http.Bar1);
+		set beresp.http.Bar2 = urlcode.encode(beresp.http.Foo2);
+		set beresp.http.Baz2 = urlcode.decode(beresp.http.Bar2);
+		set beresp.http.Bar3 = urlcode.encode(beresp.http.Foo3 + " "
+			+ beresp.http.Foo4) + "!";
+		set beresp.http.Baz3 = urlcode.decode("hello" + beresp.http.Foo5
+			+ "0world") + "!";
+		set beresp.http.Baz4 = urlcode.decode("hello" + beresp.http.Foo6
+			+ "20world") + "!";
+		set beresp.http.Baz5 = urlcode.decode("hello" + beresp.http.Foo7
+			+ "world") + "!";
+		set beresp.http.Bar6 = urlcode.encode("hello"
+			+ beresp.http.nonexistant + "world") + "!";
+		set beresp.http.Baz6 = urlcode.decode("hello"
+			+ beresp.http.nonexistant + "world") + "!";
+	}
+} -start
+
+client c1 {
+	txreq -url "/"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.X-Varnish == "1001"
+	expect resp.http.foo1 == "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_~"
+	expect resp.http.bar1 == "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_~"
+	expect resp.http.baz1 == "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_~"
+	expect resp.http.foo2 == "`!@#$%^&*()+={}[]:;'\\|<>,?/ \""
+	expect resp.http.bar2 == "%60%21%40%23%24%25%5E%26%2A%28%29%2B%3D%7B%7D%5B%5D%3A%3B%27%5C%7C%3C%3E%2C%3F%2F%20%22"
+	expect resp.http.baz2 == "`!@#$%^&*()+={}[]:;'\\|<>,?/ \""
+	expect resp.http.bar3 == "hello%20world!"
+	expect resp.http.baz3 == "hello world!"
+	expect resp.http.baz4 == "hello world!"
+	expect resp.http.baz5 == "hello world!"
+	expect resp.http.baz6 == "helloworld!"
+} -run
