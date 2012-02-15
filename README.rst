@@ -48,7 +48,7 @@ encode
 Prototype
         ::
 
-		urlcode.encode(STRING input)
+		urlcode.encode(STRING_LIST input)
 
 Return value
 	STRING
@@ -65,7 +65,7 @@ decode
 Prototype
         ::
 
-		urlcode.decode(STRING input)
+		urlcode.decode(STRING_LIST input)
 
 Return value
 	STRING
@@ -106,7 +106,7 @@ Make targets:
 HISTORY
 =======
 
-Version 0.1: Initial version.
+Version 1.0: Initial version.
 
 COPYRIGHT
 =========
