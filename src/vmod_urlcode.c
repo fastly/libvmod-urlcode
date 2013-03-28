@@ -26,9 +26,7 @@ vmod_encode(struct sess *sp, const char *str, ...)
 	e += u;
 	va_start(ap, str);
 	while (b < e && str != vrt_magic_string_end) {
-		while (str == NULL)
-			str = va_arg(ap, const char *);
-		while (b < e && *str) {
+		while (b < e && str && *str) {
 			if (visalnum((int) *str) || *str == '-' || *str == '.' 
 			    || *str ==  '_' || *str ==  '~') { /* RFC3986 2.3 */
 				*b++ = *str++;

@@ -33,6 +33,7 @@ varnish v1 -vcl+backend {
 			+ beresp.http.nonexistant + "world") + "!";
 		set beresp.http.Baz6 = urlcode.decode({"hello%20"}
 			+ beresp.http.nonexistant + "world") + "!";
+		set beresp.http.Baz7 = urlcode.decode(beresp.http.nonexistant) + "!";
 	}
 } -start
 
@@ -53,4 +54,5 @@ client c1 {
 	expect resp.http.baz5 == "hello world!"
 	expect resp.http.bar6 == "hello%20world!"
 	expect resp.http.baz6 == "hello world!"
+	expect resp.http.baz7 == "!"
 } -run
