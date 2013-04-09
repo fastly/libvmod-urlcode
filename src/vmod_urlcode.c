@@ -34,7 +34,8 @@ vmod_encode(struct sess *sp, const char *str, ...)
 				b = e; /* not enough space */
 			} else {
 				*b++ = '%';
-				*b++ = hexchars[*str >> 4];
+				unsigned char foo = *str;
+				*b++ = hexchars[foo >> 4];
 				*b++ = hexchars[*str & 15];
 				str++;
 			}

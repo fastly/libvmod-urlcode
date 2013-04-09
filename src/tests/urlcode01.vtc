@@ -9,6 +9,7 @@ server s1 {
 		-hdr "Foo5: %2" \
 		-hdr "Foo6: %" \
 		-hdr "Foo7: +" \
+		-hdr "Foo8: \xf6\xff" \
 		-hdr "Connection: close" \
 		-body "Hi!\n"
 } -start
@@ -34,6 +35,7 @@ varnish v1 -vcl+backend {
 		set beresp.http.Baz6 = urlcode.decode({"hello%20"}
 			+ beresp.http.nonexistant + "world") + "!";
 		set beresp.http.Baz7 = urlcode.decode(beresp.http.nonexistant) + "!";
+		set beresp.http.Bar8 = urlcode.encode(beresp.http.Foo8);
 	}
 } -start
 
@@ -55,4 +57,5 @@ client c1 {
 	expect resp.http.bar6 == "hello%20world!"
 	expect resp.http.baz6 == "hello world!"
 	expect resp.http.baz7 == "!"
+	expect resp.http.bar8 == "%F6%FF"
 } -run
