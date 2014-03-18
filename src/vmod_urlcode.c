@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "vrt.h"
-#include "bin/varnishd/cache.h"
+#include "cache/cache.h"
 
 #include "vcc_if.h"
 
@@ -12,17 +12,16 @@ static char hexchars[] = "0123456789ABCDEF";
 	((c >= '0' && c <= '9') || visalpha(c))
 
 const char *
-vmod_encode(struct sess *sp, const char *str, ...)
+vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
 {
 	char *b, *e;
 	unsigned u;
 	va_list ap;
 
-	CHECK_OBJ_NOTNULL(sp, SESS_MAGIC);
-	CHECK_OBJ_NOTNULL(sp->http, HTTP_MAGIC);
-	CHECK_OBJ_NOTNULL(sp->http->ws, WS_MAGIC);
-	u = WS_Reserve(sp->http->ws, 0);
-	e = b = sp->http->ws->f;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
+	u = WS_Reserve(ctx->ws, 0);
+	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
 	while (b < e && str != vrt_magic_string_end) {
@@ -46,12 +45,12 @@ vmod_encode(struct sess *sp, const char *str, ...)
 		*b = '\0';
 	b++;
 	if (b > e) {
-		WS_Release(sp->http->ws, 0);
+		WS_Release(ctx->ws, 0);
 		return (NULL);
 	} else {
 		e = b;
-		b = sp->http->ws->f;
-		WS_Release(sp->http->ws, e - b);
+		b = ctx->ws->f;
+		WS_Release(ctx->ws, e - b);
 		return (b);
 	}
 }
@@ -69,7 +68,7 @@ vmod_hex_to_int(char c)
 }
 
 const char *
-vmod_decode(struct sess *sp, const char *str, ...)
+vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
 {
 	char *b, *e;
 	int h, l;
@@ -77,11 +76,10 @@ vmod_decode(struct sess *sp, const char *str, ...)
 	va_list ap;
 	int percent = 0;
 
-	CHECK_OBJ_NOTNULL(sp, SESS_MAGIC);
-	CHECK_OBJ_NOTNULL(sp->http, HTTP_MAGIC);
-	CHECK_OBJ_NOTNULL(sp->http->ws, WS_MAGIC);
-	u = WS_Reserve(sp->http->ws, 0);
-	e = b = sp->http->ws->f;
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
+	u = WS_Reserve(ctx->ws, 0);
+	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
 	while (b < e && str != vrt_magic_string_end) {
@@ -118,12 +116,12 @@ vmod_decode(struct sess *sp, const char *str, ...)
 		*b = '\0';
 	b++;
 	if (b > e) {
-		WS_Release(sp->http->ws, 0);
+		WS_Release(ctx->ws, 0);
 		return (NULL);
 	} else {
 		e = b;
-		b = sp->http->ws->f;
-		WS_Release(sp->http->ws, e - b);
+		b = ctx->ws->f;
+		WS_Release(ctx->ws, e - b);
 		return (b);
 	}
 }
