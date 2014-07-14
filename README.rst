@@ -87,10 +87,20 @@ The source tree is based on autotools to configure the building, and
 does also have the necessary bits in place to do functional unit tests
 using the varnishtest tool.
 
-Usage::
+1.Usage::
 
  ./configure VARNISHSRC=DIR [VMODDIR=DIR]
 
+2. installation on centos6 with varnish  3.0 ~3.05 
+::
+    yum install python-docutils  -y
+    git clone -b  varnish-3   https://github.com/fastly/libvmod-urlcode.git 
+    sh autogen.sh
+    ./configure  VARNISHSRC=varnish src dir  VMODDIR= varnish installed dir /lib/varnish/vmods/
+    eg:  
+    ./configure  VARNISHSRC=/usr/local/src/varnish-3.0.5/  VMODDIR=/usr/local/varnish/lib/varnish/vmods/
+    make &&make install
+    
 `VARNISHSRC` is the directory of the Varnish source tree for which to
 compile your vmod. Both the `VARNISHSRC` and `VARNISHSRC/include`
 will be added to the include search paths for your module.
