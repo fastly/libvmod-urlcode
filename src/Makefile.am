@@ -1,28 +1,28 @@
-AM_CPPFLAGS = @VMOD_INCLUDES@
+AM_CFLAGS = $(VARNISHAPI_CFLAGS) -Wall -Werror
+AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS)
 
-vmoddir = @VMOD_DIR@
 vmod_LTLIBRARIES = libvmod_urlcode.la
 
-libvmod_urlcode_la_LDFLAGS = -module -export-dynamic -avoid-version
-
 libvmod_urlcode_la_SOURCES = \
-	vcc_if.c \
-	vcc_if.h \
 	vmod_urlcode.c
 
-vcc_if.c vcc_if.h: @VMODTOOL@ $(top_srcdir)/src/vmod_urlcode.vcc
-	@VMODTOOL@ $(top_srcdir)/src/vmod_urlcode.vcc
+nodist_libvmod_urlcode_la_SOURCES = \
+	vcc_urlcode_if.c \
+	vcc_urlcode_if.h
 
-VMOD_TESTS = tests/*.vtc
-.PHONY: $(VMOD_TESTS)
+dist_man_MANS = vmod_urlcode.3
 
-tests/*.vtc:
-	@VARNISHTEST@ -Dvarnishd=@VARNISHD@ -Dvmod_topbuild=$(abs_top_builddir) $@
+@BUILD_VMOD_URLCODE@
 
-check: $(VMOD_TESTS)
+AM_TESTS_ENVIRONMENT = \
+	PATH="$(VMOD_TEST_PATH)" \
+	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH)"
+TEST_EXTENSIONS = .vtc
+VTC_LOG_COMPILER = varnishtest -v
+AM_VTC_LOG_FLAGS = -Dvmod_urlcode="$(VMOD_URLCODE)"
+
+TESTS = @VMOD_TESTS@
 
 EXTRA_DIST = \
 	vmod_urlcode.vcc \
 	$(VMOD_TESTS)
-
-CLEANFILES = $(builddir)/vcc_if.c $(builddir)/vcc_if.h
