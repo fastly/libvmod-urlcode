@@ -15,7 +15,7 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-	import urlcode from "${vmod_topbuild}/src/.libs/libvmod_urlcode.so";
+	import ${vmod_urlcode};
 
 	sub vcl_backend_response {
 		set beresp.http.Bar1 = urlcode.encode(beresp.http.Foo1);
