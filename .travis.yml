@@ -1,0 +1,32 @@
+---
+sudo: required
+dist: trusty
+
+language: c
+
+addons:
+  apt:
+    packages:
+    - python-docutils
+
+before_install:
+  - set -e
+  - wget https://repo.varnish-cache.org/source/varnish-5.0.0.tar.gz
+  - tar -zxf varnish-*.tar.gz
+  - pushd varnish-*/
+  - ./configure --prefix=/usr
+  - make -sj32
+  - sudo make install
+  - popd
+
+before_script:
+  - ./autogen.sh
+  - ./configure --prefix=/usr
+  - make -j4
+
+script:
+  - make check -j4
+
+compiler:
+  - clang
+  - gcc

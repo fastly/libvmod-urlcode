@@ -3,7 +3,7 @@
 #include "vrt.h"
 #include "cache/cache.h"
 
-#include "vcc_if.h"
+#include "vcc_urlcode_if.h"
 
 static char hexchars[] = "0123456789ABCDEF";
 #define visalpha(c) \
@@ -71,10 +71,11 @@ const char *
 vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
 {
 	char *b, *e;
-	int h, l;
+	int l;
 	unsigned u;
 	va_list ap;
 	int percent = 0;
+	int h = 0;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
