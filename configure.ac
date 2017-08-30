@@ -8,6 +8,7 @@ AC_CONFIG_HEADER([config.h])
 
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror foreign parallel-tests])
 AM_SILENT_RULES([yes])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 LT_PREREQ([2.2.6])
 LT_INIT([dlopen disable-static])
