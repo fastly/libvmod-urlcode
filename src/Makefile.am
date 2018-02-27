@@ -17,7 +17,8 @@ VMOD_TESTS = tests/*.vtc
 .PHONY: $(VMOD_TESTS)
 
 tests/*.vtc:
-	@VARNISHTEST@ -Dvarnishd=@VARNISHD@ -Dvmod_topbuild=$(abs_top_builddir) $@
+	PATH=@LIBVARNISHAPI_SBINDIR@:$$PATH \
+	@VARNISHTEST@ -Dvmod_topbuild=$(abs_top_builddir) $@
 
 check: $(VMOD_TESTS)
 
