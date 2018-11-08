@@ -1,9 +1,8 @@
 #include <stdlib.h>
 
-#include "vrt.h"
-#include "cache/cache.h"
+#include <cache/cache.h>
 
-#include "vcc_if.h"
+#include <vcc_if.h>
 
 static char hexchars[] = "0123456789ABCDEF";
 #define visalpha(c) \
@@ -24,14 +23,20 @@ vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
 	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
-	while (b < e && str != vrt_magic_string_end) {
-		while (b < e && str && *str) {
-			if (visalnum((int) *str) || *str == '-' || *str == '.' 
-			    || *str ==  '_' || *str ==  '~') { /* RFC3986 2.3 */
+	while (b < e && str != vrt_magic_string_end)
+	{
+		while (b < e && str && *str)
+		{
+			if (visalnum((int)*str) || *str == '-' || *str == '.' || *str == '_' || *str == '~')
+			{ /* RFC3986 2.3 */
 				*b++ = *str++;
-			} else if (b + 4 >= e) { /* % hex hex NULL */
+			}
+			else if (b + 4 >= e)
+			{				 /* % hex hex NULL */
 				b = e; /* not enough space */
-			} else {
+			}
+			else
+			{
 				*b++ = '%';
 				unsigned char foo = *str;
 				*b++ = hexchars[foo >> 4];
@@ -44,10 +49,13 @@ vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
 	if (b < e)
 		*b = '\0';
 	b++;
-	if (b > e) {
+	if (b > e)
+	{
 		WS_Release(ctx->ws, 0);
 		return (NULL);
-	} else {
+	}
+	else
+	{
 		e = b;
 		b = ctx->ws->f;
 		WS_Release(ctx->ws, e - b);
@@ -82,11 +90,16 @@ vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
 	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
-	while (b < e && str != vrt_magic_string_end) {
-		if (str == NULL || *str == '\0') {
+	while (b < e && str != vrt_magic_string_end)
+	{
+		if (str == NULL || *str == '\0')
+		{
 			str = va_arg(ap, const char *);
-		} else if (percent == 0) {
-			switch(*str) {
+		}
+		else if (percent == 0)
+		{
+			switch (*str)
+			{
 			case '%':
 				percent = 1;
 				str++;
@@ -99,30 +112,36 @@ vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
 				*b++ = *str++;
 				break;
 			}
-		} else if (percent == 1) {
+		}
+		else if (percent == 1)
+		{
 			h = vmod_hex_to_int(*str++);
 			if (h < 0)
 				b = e;
 			percent = 2;
-		} else if (percent == 2) {
+		}
+		else if (percent == 2)
+		{
 			l = vmod_hex_to_int(*str++);
 			if (l < 0)
 				b = e;
-			*b++ = (char) ((h << 4) | l);
+			*b++ = (char)((h << 4) | l);
 			percent = 0;
 		}
 	}
 	if (b < e)
 		*b = '\0';
 	b++;
-	if (b > e) {
+	if (b > e)
+	{
 		WS_Release(ctx->ws, 0);
 		return (NULL);
-	} else {
+	}
+	else
+	{
 		e = b;
 		b = ctx->ws->f;
 		WS_Release(ctx->ws, e - b);
 		return (b);
 	}
 }
-
