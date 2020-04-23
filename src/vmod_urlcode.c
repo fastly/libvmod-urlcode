@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-#include "vrt.h"
 #include "cache/cache.h"
 
 #include "vcc_if.h"
@@ -20,7 +19,7 @@ vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
-	u = WS_Reserve(ctx->ws, 0);
+	u = WS_ReserveAll(ctx->ws);
 	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
@@ -78,7 +77,7 @@ vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
-	u = WS_Reserve(ctx->ws, 0);
+	u = WS_ReserveAll(ctx->ws);
 	e = b = ctx->ws->f;
 	e += u;
 	va_start(ap, str);
