@@ -27,6 +27,8 @@ Makefile.in
 
 /src/vcc_if.c
 /src/vcc_if.h
+/src/vmod_urlcode.man.rst
+/src/vmod_urlcode.rst
 /vmod_urlcode.3
 /nbproject/private/
 
