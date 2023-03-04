@@ -10,21 +10,21 @@ static char hexchars[] = "0123456789ABCDEF";
 #define visalnum(c) \
 	((c >= '0' && c <= '9') || visalpha(c))
 
-const char *
-vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
+VCL_STRING
+vmod_encode(VRT_CTX, VCL_STRANDS s)
 {
 	char *b, *e;
 	unsigned u;
-	va_list ap;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
 	u = WS_ReserveAll(ctx->ws);
 	e = b = ctx->ws->f;
 	e += u;
-	va_start(ap, str);
-	while (b < e && str != vrt_magic_string_end)
+
+    for(int i=0; i < s->n; i++)
 	{
+        const char *str = s->p[i];
 		while (b < e && str && *str)
 		{
 			if (visalnum((int)*str) || *str == '-' || *str == '.' || *str == '_' || *str == '~')
@@ -44,7 +44,6 @@ vmod_encode(const struct vrt_ctx *ctx, const char *str, ...)
 				str++;
 			}
 		}
-		str = va_arg(ap, const char *);
 	}
 	if (b < e)
 		*b = '\0';
