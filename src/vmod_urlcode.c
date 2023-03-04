@@ -74,60 +74,63 @@ vmod_hex_to_int(char c)
 	return (-1);
 }
 
-const char *
-vmod_decode(const struct vrt_ctx *ctx, const char *str, ...)
+VCL_STRING
+vmod_decode(VRT_CTX, VCL_STRANDS s)
 {
 	char *b, *e;
 	int h, l;
 	unsigned u;
-	va_list ap;
 	int percent = 0;
+    int i = 0;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
 	u = WS_ReserveAll(ctx->ws);
 	e = b = ctx->ws->f;
 	e += u;
-	va_start(ap, str);
-	while (b < e && str != vrt_magic_string_end)
+
+	while (b < e && i < s->n)
 	{
-		if (str == NULL || *str == '\0')
-		{
-			str = va_arg(ap, const char *);
-		}
-		else if (percent == 0)
-		{
-			switch (*str)
-			{
-			case '%':
-				percent = 1;
-				str++;
-				break;
-			case '+':
-				*b++ = ' ';
-				str++;
-				break;
-			default:
-				*b++ = *str++;
-				break;
-			}
-		}
-		else if (percent == 1)
-		{
-			h = vmod_hex_to_int(*str++);
-			if (h < 0)
-				b = e;
-			percent = 2;
-		}
-		else if (percent == 2)
-		{
-			l = vmod_hex_to_int(*str++);
-			if (l < 0)
-				b = e;
-			*b++ = (char)((h << 4) | l);
-			percent = 0;
-		}
+        const char *str = s->p[i];
+
+        while(*str)
+        {
+            if (percent == 0)
+            {
+                switch (*str)
+                {
+                    case '%':
+                        percent = 1;
+                        str++;
+                        break;
+                    case '+':
+                        *b++ = ' ';
+                        str++;
+                        break;
+                    default:
+                        *b++ = *str++;
+                        break;
+                }
+            }
+            else if (percent == 1)
+            {
+                h = vmod_hex_to_int(*str++);
+                if (h < 0)
+                    b = e;
+                percent = 2;
+            }
+            else if (percent == 2)
+            {
+                l = vmod_hex_to_int(*str++);
+                if (l < 0)
+                    b = e;
+                *b++ = (char)((h << 4) | l);
+                percent = 0;
+            }
+        }
+        i++;
 	}
+
 	if (b < e)
 		*b = '\0';
 	b++;
