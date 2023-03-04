@@ -81,7 +81,7 @@ vmod_decode(VRT_CTX, VCL_STRANDS s)
 	int h, l;
 	unsigned u;
 	int percent = 0;
-    int i = 0;
+	int i = 0;
 
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	CHECK_OBJ_NOTNULL(ctx->ws, WS_MAGIC);
